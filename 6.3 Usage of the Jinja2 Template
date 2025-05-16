@@ -1,0 +1,14 @@
+Example: Based on the chapter "Usage of Ansible Roles", change the home page. If the
+host name is client-1, "this is test1" is displayed. If the host name is client-2, "this is
+test2" is displayed.
+Modify the home page file index.html.j2 as follows:
+{% if ansible_hostname == "client-1" %}
+this is test1
+{% elif ansible_hostname == "client-2" %}
+this is test2
+{% endif %}
+After the modification, execute the httpd_role.yaml file again for the configuration to
+take effect.
+After the execution, perform a test to check whether the requirements can be met.
+curl 172.16.0.12:81
+curl 172.16.0.13:81
