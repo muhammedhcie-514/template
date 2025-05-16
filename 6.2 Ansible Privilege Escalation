@@ -1,0 +1,35 @@
+- hosts: all
+ gather_facts: false
+ vars_files:
+ /root/yaml/username
+ tasks:
+ - name: create user
+ user:
+ name: "{{ item.name }}"
+ comment: "{{ item.department }}"
+ uid: "{{ item.uid }}"
+ password: "{{ lookup('password','/root/yaml/password-{{ item.name }} chars=digits
+length=8') | password_hash('sha512') }}"
+ loop: "{{ user }}"
+ - name: add sudo
+ lineinfile:
+path: /etc/sudoers
+ line: "{{ item.name }} ALL=(ALL) NOPASSWD:ALL"
+ loop: "{{ user }}"
+After the modification, execute the playbook again to enable the user zhangsan to have
+the privilege escalation capability.
+Step 2 Configure password-free login.
+Set the password-free login permission for the user zhangsan on the controller.
+Step 3 Modify the role file.
+Modify the playbook in step 7 in the section "Usage of Roles" as follows:
+- hosts: all
+ remote_user: zhangsan
+ gather_facts: true
+ roles:
+ - role: httpd
+ become: true
+ become_method: sudo
+ become_user: root
+ become_ask_pass: false
+After the modification, run the playbook to check whether it can run properly.
+
